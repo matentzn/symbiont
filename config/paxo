@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+python "$(dirname "$0")/paxo_tool/paxo.py" "$@"
+
+
