@@ -2,14 +2,14 @@ GAT_URL="https://storage.googleapis.com/google-code-archive-downloads/v2/code.go
 TOOLS_DIR=/tools
 TMP_DIR=tmp
 
-$(TMP_DIR)/google-api-translate-java-0.97.jar:
+$(TMP_DIR)/google-api-translate-java-0.97.jar:  | $(TMP_DIR)/
 	wget "$(GAT_URL)" -O $@
 	mvn install:install-file -Dfile=$(PWD)/$@ -DgroupId=com.googlecode -DartifactId=google-api-translate-java -Dversion=0.97 -Dpackaging=jar
 
 $(TMP_DIR)/:
 	mkdir -p $@
 
-$(TMP_DIR)/logmap-matcher/target/logmap-matcher-$(LOGMAP_VERSION).jar: | $(TMP_DIR)/
+$(TMP_DIR)/logmap-matcher/target/logmap-matcher-$(LOGMAP_VERSION).jar: $(TMP_DIR)/google-api-translate-java-0.97.jar | $(TMP_DIR)/
 	cd tmp && rm -rf logmap-matcher && git clone https://github.com/ernestojimenezruiz/logmap-matcher \
 	&& cd logmap-matcher && mvn clean package
 

@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+# see https://github.com/EBISPOT/OXO/tree/master/paxo-loader
+pyenv activate paxo
 python "$(dirname "$0")/paxo_tool/paxo.py" "$@"
-
+pyenv deactivate
 

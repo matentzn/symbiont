@@ -25,3 +25,7 @@ _AML_:
 
 - Documentation: https://github.com/AgreementMakerLight/AML-Project/tree/v3.2 
 (note: make sure this is the documentation) of the version referred to in the Dockerfile
+
+_PAXO_:
+
+- Documentation: https://github.com/EBISPOT/OXO/tree/master/paxo-loader
