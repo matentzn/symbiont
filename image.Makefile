@@ -15,6 +15,9 @@ $(TMP_DIR)/logmap-matcher/target/logmap-matcher-$(LOGMAP_VERSION).jar: $(TMP_DIR
 
 $(TOOLS_DIR)/logmap.jar: $(TMP_DIR)/logmap-matcher/target/logmap-matcher-$(LOGMAP_VERSION).jar
 	cp $< $@
+	cp $(TMP_DIR)/logmap-matcher/target/parameters.txt $(TOOLS_DIR)/
+	cp -r $(TMP_DIR)/logmap-matcher/target/java-dependencies $(TOOLS_DIR)/
+	
 
 $(TOOLS_DIR)/aml.jar:
 	wget $(AML_ZIP) -O $(TMP_DIR)/aml.zip && cd tmp && rm -rf AML_v$(AML_VERSION) && unzip aml.zip && cd .. && cp $(TMP_DIR)/AML_v$(AML_VERSION)/AgreementMakerLight.jar $@

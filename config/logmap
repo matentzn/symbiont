@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-
+echo "This is LogMap by Ernesto Jiménez-Ruiz, see https://github.com/ernestojimenezruiz/logmap-matcher"
 java -jar "$(dirname "$0")/logmap.jar" "$@"

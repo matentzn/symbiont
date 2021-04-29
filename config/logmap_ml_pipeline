@@ -1,0 +1,49 @@
+#!/bin/sh
+set -e
+
+O1=$1
+O2=$2
+OUTDIR=$3
+ID=$4
+LOGMAP_ML_DIR=logmap_ml
+LOGMAP_OUTPUT=${OUTDIR}/logmap_output
+LOGMAP_OUTPUT_ANCHORS=${LOGMAP_OUTPUT}/logmap_anchors.txt
+LOGMAP_OUTPUT_OVERESTIMATION=${LOGMAP_OUTPUT}/logmap_overestimation.txt
+LOGMAP_ML_DATA_DIR=$LOGMAP_ML_DIR/data
+WORD2VEC_GENSIM=$LOGMAP_ML_DIR/word2vec_gensim
+
+
+./logmap MATCHER file:${O1} file:${O2} The ${OUTDIR} true
+
+#2: Embedding Models
+#You can either use the word2vec embedding by gensim (The one trained by English Wikipedia articles in 2018 download), or the ontology tailored OWL2Vec* embedding. The to-be-aligned ontologies can be set with their own embedding models or be set with one common embedding model.
+
+#Pre-process #3: Class Name and Path Extraction
+pyenv activate paxo
+python name_path.py --onto_file $O1 --name_file ${OUTDIR}/${ID}_o1_class_name.json --path_file ${OUTDIR}/${ID}_o1_all_paths.txt
+python name_path.py --onto_file $O2 --name_file ${OUTDIR}/${ID}_o2_class_name.json --path_file ${OUTDIR}/${ID}_o2_all_paths.txt
+
+#This is to extract the name information and path information for each class. It should be executed separately for two ontologies.
+
+#Step #1: Sample
+python sample.py --anchor_mapping_file ${LOGMAP_OUTPUT_ANCHORS}
+
+#See the parameter "help" and comment inside the program for more setting settings. The branch conflicts which are manually set for higher quality seed mappings are set inside the program. It will output mappings_train.txt and mappings_valid.txt.
+
+#Step #2: Train, Valid and Predict
+python train_valid.py --left_w2v_dir ${WORD2VEC_GENSIM} --right_w2v_dir ${WORD2VEC_GENSIM}
+
+python predict_candidates.py --candidate_file ${LOGMAP_OUTPUT_OVERESTIMATION} --left_w2v_dir ${WORD2VEC_GENSIM} --right_w2v_dir ${WORD2VEC_GENSIM}
+
+#Note the candidate mappings should be pre-extracted by some ontology alignment systems or from some resources (e.g., OAEI). One direct candidate source is the overlapping mappings by LogMap. predict_candidates.py by default outputs mapping scores in predict_score.txt.
+
+#Step #3: Evaluate
+#Calculate the recall w.r.t. the GS, and sample a number of mappings for annotation, by:
+
+python evaluate.py --threshold 0.65 --anchor_file ${LOGMAP_OUTPUT_ANCHORS}
+
+#It will output a file with a part of the mappings for human annotation. The annotation is done by appending "true" or "false" to each mapping (see annotation example in evaluate.py). With the manual annotation and the GS, the precision and recall can be approximated by:
+
+python approximate_precision_recall.py
+
+#Please see Eq. (2)(3)(4) in the paper for how the precision and recall approximation works. For more accurate approximate, it is suggested to annotate and use the mappings of at least three systems to approximate the GS. Besides the original LogMap and LogMap-ML, you can also consider AML as well.

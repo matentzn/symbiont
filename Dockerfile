@@ -3,8 +3,8 @@ FROM obolibrary/odkfull
 
 ENV LANG="C.UTF-8" \
     LC_ALL="C.UTF-8" \
-    PATH="/opt/pyenv/shims:/opt/pyenv/bin:$PATH" \
-    PYENV_ROOT="/opt/pyenv" \
+    PATH="/root/.pyenv/shims:/root/.pyenv/bin:$PATH" \
+    PYENV_ROOT="/root/.pyenv" \
     PYENV_SHELL="bash" \
     AML_VERSION="3.2" \
     LOGMAP_VERSION="4.0"
@@ -17,9 +17,9 @@ RUN make dependencies && make clean && rm Makefile
 #### Install PyEnv
 # Instructions from https://code.luasoftware.com/tutorials/linux/install-latest-python-on-ubuntu-via-pyenv/
 RUN git clone --depth 1 https://github.com/pyenv/pyenv.git $PYENV_ROOT &&\
-    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc &&\
-    echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc &&\
-    echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc &&\
+    echo 'export PYENV_ROOT="/root/.pyenv/"' >> /root/.bashrc &&\
+    echo 'export PATH="/root/.pyenv/bin:$PATH"' >> /root/.bashrc &&\
+    echo 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> /root/.bashrc &&\
     echo "Pyenv setup done"
 
 COPY requirements.txt /
@@ -29,19 +29,15 @@ RUN pip install -r /requirements.txt
 RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-
-RUN pyenv install 3.7.10 && pyenv install 2.7.18
+RUN git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /root/.bash_profile
+RUN pyenv install 3.7.10 && pyenv virtualenv 3.7.10 logmap_ml
+RUN pyenv install 2.7.18 && pyenv virtualenv 2.7.18 paxo
 
 COPY config /match_config
 RUN cp /match_config/* /tools
-
-RUN pyenv virtualenv 2.7.18 paxo &&\
-    pyenv activate paxo &&\
-    pip install -r /tools/paxo_tool/requirements.txt &&\
-    pyenv deactivate
-
-RUN pyenv virtualenv 3.7.10 logmap_ml &&\
-    pyenv activate logmap_ml &&\
-    pip install -r /tools/requirements-logmap-ml.txt &&\
-    pyenv deactivate
+ 
+RUN $PYENV_ROOT/versions/paxo/bin/pip install -r /tools/requirements-paxo.txt
+RUN $PYENV_ROOT/versions/logmap_ml/bin/pip install -r /tools/requirements-logmap-ml.txt
+RUN python -m pip uninstall sssom && pip install git+https://github.com/mapping-commons/sssom-py.git@sssom-1
 
