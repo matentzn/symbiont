@@ -1,7 +1,6 @@
-# Monarch Ontology Alignment Kit (MOAK)
+# SymbiOnt
 
-The Monarch Ontology Alignment Kit (MOAK) is a docker image that contains a set of ontology matching tools which convert
-output into a common format (SSSOM).
+A toolkit building implementing workflows to merge / augment existing ontologies. SymbiOnt builds on existing tools, such as ontology matchers, SSSOM python toolkit and Boomer.
 
 ## Tools embedded
 
