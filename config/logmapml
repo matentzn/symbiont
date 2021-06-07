@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+echo "This is LogMap-ML by Jiaoyan Chen (et al), see https://github.com/KRR-Oxford/OntoAlign"
+
 O1=$1
 O2=$2
 OUTDIR=$3
@@ -11,12 +13,16 @@ LOGMAP_OUTPUT_ANCHORS=${LOGMAP_OUTPUT}/logmap_anchors.txt
 LOGMAP_OUTPUT_OVERESTIMATION=${LOGMAP_OUTPUT}/logmap_overestimation.txt
 LOGMAP_ML_DATA_DIR=$LOGMAP_ML_DIR/data
 WORD2VEC_GENSIM=$LOGMAP_ML_DIR/word2vec_gensim
-
+GENSIM="https://drive.google.com/u/0/uc?id=1rm9uJEKG25PJ79zxbZUWuaUroWeoWbFR&export=download"
 
 ./logmap MATCHER file:${O1} file:${O2} The ${OUTDIR} true
 
 #2: Embedding Models
 #You can either use the word2vec embedding by gensim (The one trained by English Wikipedia articles in 2018 download), or the ontology tailored OWL2Vec* embedding. The to-be-aligned ontologies can be set with their own embedding models or be set with one common embedding model.
+
+# owl2vec*.py for each of the ontologies seperately.
+
+# Ernesto wants to migrate this MELT framework (goal, but not concretely planned)
 
 #Pre-process #3: Class Name and Path Extraction
 pyenv activate paxo

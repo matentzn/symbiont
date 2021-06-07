@@ -1,4 +1,44 @@
 #!/bin/sh
 set -e
 echo "This is LogMap by Ernesto Jiménez-Ruiz, see https://github.com/ernestojimenezruiz/logmap-matcher"
-java -jar "$(dirname "$0")/logmap.jar" "$@"
+
+O1=$1
+shift
+O2=$1
+shift
+OUTDIR=$1
+BENCHMARK_LOG=${OUTDIR}/benchmark.txt
+shift
+
+echo "java ${JAVA_OPTS} -jar ${TOOLS_DIR}/logmap.jar MATCHER file:${O1} file:${O2} ${OUTDIR} $*"
+echo "command: \"java ${JAVA_OPTS} -jar ${TOOLS_DIR}/logmap.jar MATCHER file:${O1} file:${O2} ${OUTDIR} $*\"" >> ${BENCHMARK_LOG}
+echo "start_mapping: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+java ${JAVA_OPTS} -jar "${TOOLS_DIR}/logmap.jar" MATCHER "file:${O1}" "file:${O2}" "${OUTDIR}/" "$@"
+echo "end_mapping: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+echo "start_sssom: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+pyenv activate sssom
+sssom convert -i "${OUTDIR}/logmap_anchors.rdf" -f alignment-api-xml -o "${OUTDIR}/anchors.sssom.tsv"
+sssom convert -i "${OUTDIR}/logmap2_mappings.rdf" -f alignment-api-xml -o "${OUTDIR}/mappings.sssom.tsv"
+# overestimation in txt -> could we 
+# Logmap does not produce -> but conflicting mappings (we would like to avoid, but some may be correct)
+# conflicting mappings should get a lower probality
+# discarded mappings (low probability)
+# hard discarded (very rare positive mappings)
+# Logmap tries to find equivalents disease->mendelian disease would be wrong
+# Print format sssom.
+# Anything outside the overestimation could be negative. Is this useful?
+pyenv deactivate
+echo "end_sssom: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+
+# Owl2vec elk or structural
+# owlready + pellet
+# owlrl - reasoning? owl2rl and rdfs schema entailment (rdflib connected)
+# Questions Ernesto:
+# Does not seem to be able to find parameters.txt although its in the same dir as the jar. #should be in working directory
+# Overestimation mappings in alignment format?
+# Go through overarching framework with Ernesto and get opinion.
+# Basically 
+# https://drive.google.com/drive/folders/1n0McGJkFAxtBjlRISOAqMxfuV86RqwJU
+# seals client (melt can execute it.)

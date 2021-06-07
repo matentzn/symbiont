@@ -1,4 +1,27 @@
 #!/bin/sh
 set -e
+echo "This is AgreementMakerLight (AML) by LASIGE, see https://github.com/AgreementMakerLight/AML-Project"
 
-java -jar "$(dirname "$0")/aml.jar" "$@"
+O1=$1
+shift
+O2=$1
+shift
+OUTDIR=$1
+shift
+OUTFILE=${OUTDIR}/aml.xml
+BENCHMARK_LOG=${OUTDIR}/benchmark.txt
+
+
+echo "java ${JAVA_OPTS} -jar ${TOOLS_DIR}/aml.jar -s ${O1} -t ${O2} -o ${OUTFILE} -a $*"
+echo "command: \"java ${JAVA_OPTS} -jar ${TOOLS_DIR}/aml.jar -s ${O1} -t ${O2} -o ${OUTFILE} -a $*\"" >> ${BENCHMARK_LOG}
+echo "start_mapping: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+java ${JAVA_OPTS} -jar "${TOOLS_DIR}/aml.jar" -s ${O1} -t ${O2} -o ${OUTFILE} "$@"
+echo "end_mapping: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+echo "start_sssom: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+pyenv activate sssom
+sssom convert -i "${OUTFILE}" -f alignment-api-xml -o "${OUTDIR}/anchors.sssom.tsv"
+sssom convert -i "${OUTFILE}" -f alignment-api-xml -o "${OUTDIR}/mappings.sssom.tsv"
+pyenv deactivate
+echo "end_sssom: $(date -Iseconds)" >> ${BENCHMARK_LOG}
