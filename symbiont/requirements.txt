@@ -1,0 +1,5 @@
+pkginfo==1.4.1
+requests==2.21.0
+requests-toolbelt==0.8.0
+twine==1.10.0
+git+https://github.com/mapping-commons/sssom-py.git

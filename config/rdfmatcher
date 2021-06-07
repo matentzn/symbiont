@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+echo "This is RDF Matcher by Chris Mungall, see https://github.com/cmungall/rdf_matcher"
+
+O=$1
+shift
+OUTDIR=$1
+shift
+
+swipl -p library=/tools/rdf_matcher/prolog /tools/rdf_matcher/bin/rdfmatch -i ${O} "$@" match > ${OUTDIR}/rdfmatcher.sssom.tsv

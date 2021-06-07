@@ -1,4 +1,0 @@
-tensorflow==1.13.1
-gensim==3.8.0
-Owlready2==0.29
-

@@ -11,4 +11,8 @@
 # See README-editors.md for more details.
 set -e
 #make docker-build
-docker run -e ROBOT_JAVA_ARGS='-Xmx25G' -e JAVA_OPTS='-Xmx25G' -v $PWD/:/work -w /work --rm -ti monarchinitiative/ontomatch "$@"
+docker run -e ROBOT_JAVA_ARGS='-Xmx25G' \
+  -e JAVA_OPTS='-Xmx25G' \
+  -v $PWD/:/work \
+  -v $PWD/matcher_config/parameters.txt:/tools/parameters.txt \
+  -w /work --rm -ti monarchinitiative/ontomatch "$@"

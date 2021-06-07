@@ -1,0 +1,12 @@
+rdflib>=0.0
+pandas>=0.0
+pyyaml>=0.0
+linkml>=0.0.7
+jsonasobj~=1.2.1
+Sphinx>=2.3.1
+sphinx-rtd-theme==0.4.3
+sphinx-click==2.3.1
+scikit_learn>=0.0
+networkx>=0.0
+pandasql>=0.0
+git+https://github.com/mapping-commons/sssom-py.git@sssom-1
