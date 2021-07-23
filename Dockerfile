@@ -1,4 +1,4 @@
-FROM obolibrary/odkfull:v1.2.27
+FROM obolibrary/odkfull:v1.2.29
 
 ENV LANG="C.UTF-8" \
     LC_ALL="C.UTF-8" \

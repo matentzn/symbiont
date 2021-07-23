@@ -1,0 +1,12 @@
+@prefix sh:	<http://www.w3.org/ns/shacl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+
+[
+
+  sh:declare
+  [ sh:prefix "EFO" ; sh:namespace "http://www.ebi.ac.uk/efo/EFO_"],
+  [ sh:prefix "MONDO" ; sh:namespace "http://purl.obolibrary.org/obo/MONDO_"],
+  [ sh:prefix "ORDO" ; sh:namespace "hhttp://www.orpha.net/ORDO/Orphanet_"]
+].
+    
+

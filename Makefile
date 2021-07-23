@@ -3,7 +3,8 @@
 ################################################
 
 VERSION = "0.0.1"
-IM=monarchinitiative/ontomatch
+IM=monarchinitiative/symbiont
+ROBOT=robot
 
 docker-build-no-cache:
 	@docker build --no-cache -t $(IM):$(VERSION) . \
@@ -33,8 +34,8 @@ docker-publish: docker-build
 	@docker push $(IM):$(VERSION) \
 	&& docker push $(IM):latest
 
-TEST_O1_LOCAL=tests/test.mp.owl
-TEST_O2_LOCAL=tests/test.hp.owl
+TEST_O1_LOCAL=tests/mondo.neoplasm.owl
+TEST_O2_LOCAL=tests/efo.neoplasm.owl
 TEST_O1=/work/$(TEST_O1_LOCAL)
 TEST_O2=/work/$(TEST_O2_LOCAL)
 OUTDIR=out
@@ -50,24 +51,30 @@ tests/test.%.owl: mirror/%.owl
 		annotate --ontology-iri $(ONTBASE)/$@ $(ANNOTATE_ONTOLOGY_VERSION) --annotation oboInOwl:date "$(OBODATE)" --output $@.tmp.owl && mv $@.tmp.owl $@
 
 
-test-logmap:
-	rm -rf $(OUTDIR)/$@ && mkdir $(OUTDIR)/$@ &&\
-	sh run.sh logmap $(TEST_O1) $(TEST_O2) /work/$(OUTDIR)/$@ true
+$(OUTDIR)/:
+	mkdir -p $@
 
-test-aml:
+test-logmap: | $(OUTDIR)/
 	rm -rf $(OUTDIR)/$@ && mkdir $(OUTDIR)/$@ &&\
-	sh run.sh aml $(TEST_O1) $(TEST_O2) /work/$(OUTDIR)/$@ -a
+	symbiont logmap $(TEST_O1) $(TEST_O2) /work/$(OUTDIR)/$@ true
 
-test-paxo:
+test-aml: | $(OUTDIR)/
 	rm -rf $(OUTDIR)/$@ && mkdir $(OUTDIR)/$@ &&\
-	sh run.sh paxo tests/paxo_config.ini -s
+	symbiont aml $(TEST_O1) $(TEST_O2) /work/$(OUTDIR)/$@ -a
+
+test-paxo: | $(OUTDIR)/
+	rm -rf $(OUTDIR)/$@ && mkdir $(OUTDIR)/$@ &&\
+	symbiont paxo tests/paxo_config.ini -s
 
 tests/merged.test.owl: $(TEST_O1_LOCAL) $(TEST_O2_LOCAL)
 	robot merge -i $(TEST_O1_LOCAL) -i $(TEST_O2_LOCAL) annotate --ontology-iri "http://ontomatch.test/$@" -o $@
 
-test-rdfmatcher: tests/merged.test.owl
+tests/%.ttl: tests/%.owl
+	$(ROBOT) convert -i $< -f ttl -o $@
+
+test-rdfmatcher: tests/merged.test.ttl | $(OUTDIR)/
 	rm -rf $(OUTDIR)/$@ && mkdir $(OUTDIR)/$@ &&\
-	sh run.sh rdfmatcher $< /work/$(OUTDIR)/$@ --predicate skos:exactMatch
+	symbiont rdfmatcher $< /work/$(OUTDIR)/$@ -i tests/prefixes.ttl --predicate skos:exactMatch
 
 test: test-logmap test-aml test-rdfmatcher
 

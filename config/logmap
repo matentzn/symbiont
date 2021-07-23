@@ -13,6 +13,13 @@ shift
 echo "java ${JAVA_OPTS} -jar ${TOOLS_DIR}/logmap.jar MATCHER file:${O1} file:${O2} ${OUTDIR} $*"
 echo "command: \"java ${JAVA_OPTS} -jar ${TOOLS_DIR}/logmap.jar MATCHER file:${O1} file:${O2} ${OUTDIR} $*\"" >> ${BENCHMARK_LOG}
 echo "start_mapping: $(date -Iseconds)" >> ${BENCHMARK_LOG}
+
+PARAMETERS=/work/parameters.txt
+if test -f "${PARAMETERS}"; then
+    echo "${PARAMETERS} supplied by, user, using that one."
+    cp ${PARAMETERS} /tools/parameters.txt
+fi
+
 java ${JAVA_OPTS} -jar "${TOOLS_DIR}/logmap.jar" MATCHER "file:${O1}" "file:${O2}" "${OUTDIR}/" "$@"
 echo "end_mapping: $(date -Iseconds)" >> ${BENCHMARK_LOG}
 eval "$(pyenv init -)"

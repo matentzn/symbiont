@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+echo "Powered by ROBOT http://robot.obolibrary.org/"
+O1=$1
+shift
+QUERY=$1
+shift
+RESULT=$1
+
+$(ROBOT) query -i ${O1} --query ${QUERY} ${RESULT}

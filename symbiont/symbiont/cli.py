@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 import pandas as pd
 import logging
+import io
 
 
 @click.group()
@@ -34,4 +35,4 @@ def seed_mappings(input: str, input_format: str, metadata:str, curie_map_mode: s
     """
     parse file (currently only supports conversion to RDF)
     """
-    seed(input_path=input, output_path=output, input_format=input_format, metadata_path=metadata, curie_map_mode=curie_map_mode)
+    io.seed(input_path=input, output_path=output, input_format=input_format, metadata_path=metadata, curie_map_mode=curie_map_mode)
