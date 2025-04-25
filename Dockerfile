@@ -1,4 +1,4 @@
-FROM obolibrary/odkfull:v1.2.29
+FROM obolibrary/odkfull:v1.2.30
 
 ENV LANG="C.UTF-8" \
     LC_ALL="C.UTF-8" \
@@ -20,6 +20,8 @@ RUN git clone --depth 1 https://github.com/pyenv/pyenv.git $PYENV_ROOT &&\
     echo 'export PATH="/root/.pyenv/bin:$PATH"' >> /root/.bashrc &&\
     echo 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> /root/.bashrc &&\
     echo "Pyenv setup done"
+
+RUN echo "INSTALL dot and obographviz!"
 
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
@@ -55,10 +57,19 @@ RUN $PYENV_ROOT/versions/logmap_ml/bin/pip install -r /tools/requirements-logmap
 RUN $PYENV_ROOT/versions/sssom/bin/pip install -r /tools/requirements-sssom.txt
 
 ##### Installing SSSOM Development Version ######
-#RUN python3 -m pip install --upgrade pip
-#RUN python3 -m pip install linkml==0.0.7
-#RUN python3 -m pip install --upgrade --force-reinstall --no-deps git+https://github.com/mapping-commons/sssom-py.git@sssom-1 &&\
-#    echo "Warning, installing SSSOM from branch. Double check!"
+RUN python3 -m pip install --upgrade pip
+RUN python3 -m pip install --upgrade --force-reinstall git+https://github.com/mapping-commons/sssom-py.git@master &&\
+    echo "Warning, installing SSSOM from branch. Double check!"
+
+#### Installing Boomer ##########
+RUN chmod +x /tools/obodash && \
+    git clone --depth 1 https://github.com/INCATools/boomer.git && \
+    cd boomer && \
+    echo "INSTALL BOOMER" && sbt compile stage &&\
+    mkdir -p /tools/boomer/ &&\
+    mv target/universal/stage/bin /tools/boomer/ &&\
+    mv target/universal/stage/lib /tools/boomer/
+ENV PATH "/tools/boomer/bin:$PATH"
 
 COPY config /match_config
 RUN cp -r /match_config/* /tools

@@ -2,20 +2,20 @@
 #### Commands for building the Docker image ####
 ################################################
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 IM=monarchinitiative/symbiont
 ROBOT=robot
 
 docker-build-no-cache:
-	@docker build --no-cache -t $(IM):$(VERSION) . \
+	@docker build --no-cache -t $(IM):$(VERSION) . --load \
 	&& docker tag $(IM):$(VERSION) $(IM):latest
 
 docker-build:
-	@docker build -t $(IM):$(VERSION) . \
+	@docker build -t $(IM):$(VERSION) . --load \
 	&& docker tag $(IM):$(VERSION) $(IM):latest
 	
 docker-build-use-cache-dev:
-	@docker build -t $(DEV):$(VERSION) . \
+	@docker build -t $(DEV):$(VERSION) . --load \
 	&& docker tag $(DEV):$(VERSION) $(DEV):latest
 
 docker-clean:
